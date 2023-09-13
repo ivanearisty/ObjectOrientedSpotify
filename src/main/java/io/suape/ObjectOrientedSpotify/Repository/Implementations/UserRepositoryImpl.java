@@ -16,12 +16,13 @@ import org.springframework.stereotype.Repository;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Objects;
 
+import static io.suape.ObjectOrientedSpotify.Queries.UserQueries.*;
 @Repository
 @RequiredArgsConstructor
 @Slf4j
 public class UserRepositoryImpl implements UserRepository<User> {
-    private static final String COUNT_USER_EMAIL_QUERY = ""; //This is empty at the moment
     private final NamedParameterJdbcTemplate jdbc;
     @Override
     public User create(User user) {
@@ -29,12 +30,14 @@ public class UserRepositoryImpl implements UserRepository<User> {
         if(getEmailCount(user.getEmail().trim().toLowerCase()) > 0){
             throw new APIException("Email already in use");
         }
-        //get spotify credentials
-        String spotifyUserId;
+        //TODO: get spotify credentials
+        String spotifyUserId = "A 22 char string";
 
         //save new user
         try{
-            SqlParameterSource parameterSource = getSQLParameterSource(user);
+            SqlParameterSource parameters = getSQLParameterSource(user);
+            jdbc.update(INSERT_USER_QUERY, parameters);
+            user.setUserId(Objects.requireNonNull(spotifyUserId));
         }catch (EmptyResultDataAccessException exception){
 
         }catch (Exception exception){
@@ -72,6 +75,8 @@ public class UserRepositoryImpl implements UserRepository<User> {
         return jdbc.queryForObject(COUNT_USER_EMAIL_QUERY, Map.of("email", email), Integer.class);
     }
 
+//    TODO:
     private SqlParameterSource getSQLParameterSource(User user) {
+        return null;
     }
 }

@@ -12,11 +12,13 @@ USE ObjectOrientedSpotify;
 -- Note: The order of dropping tables matters due to foreign key relationships
 DROP TABLE IF EXISTS Playlists_Tracks;
 DROP TABLE IF EXISTS User_Events;
+DROP TABLE IF EXISTS Genres_Playlists;
 DROP TABLE IF EXISTS Events;
 DROP TABLE IF EXISTS Reset_Password_Verifications;
 DROP TABLE IF EXISTS Account_Verifications;
 DROP TABLE IF EXISTS Multi_Factor_Authentications;
 DROP TABLE IF EXISTS Tracks;
+DROP TABLE IF EXISTS Genres;
 DROP TABLE IF EXISTS Playlists;
 DROP TABLE IF EXISTS Users;
 
@@ -54,6 +56,24 @@ CREATE TABLE Genres
 (
     genre_id     BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
     genre_name   VARCHAR(25) NOT NULL
+);
+
+CREATE TABLE Genres_Playlists
+(
+    genre_id       VARCHAR(22) NOT NULL,
+    playlist_id    VARCHAR(22) NOT NULL,
+
+    PRIMARY KEY (genre_id, playlist_id),
+
+    INDEX fk_genres_playlists_1_idx (genre_id ASC) VISIBLE,
+    FOREIGN KEY (genre_id)
+        REFERENCES Genres (genre_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE,
+    FOREIGN KEY (playlist_id)
+        REFERENCES Playlists (playlist_id)
+        ON DELETE CASCADE
+        ON UPDATE CASCADE
 );
 
 -- Create the Tracks table
