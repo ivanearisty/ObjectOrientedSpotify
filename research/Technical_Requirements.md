@@ -1,6 +1,5 @@
 # Techical Requirements
 ## User
-- Application User
 - User account
     1. (U) Verifiable account by email address
     2. (U) User ID not shown to user
