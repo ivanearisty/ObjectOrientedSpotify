@@ -7,9 +7,8 @@ CREATE SCHEMA IF NOT EXISTS ObjectOrientedSpotify;
 -- Select the database
 USE ObjectOrientedSpotify;
 
--- Drop existing tables
+-- Drop existing tables (in the correct order due to foreign keys)
 
--- Note: The order of dropping tables matters due to foreign key relationships
 DROP TABLE IF EXISTS Playlists_Tracks;
 DROP TABLE IF EXISTS User_Events;
 DROP TABLE IF EXISTS Genres_Playlists;
@@ -25,11 +24,11 @@ DROP TABLE IF EXISTS Users;
 -- Create the Users table
 CREATE TABLE Users
 (
-    user_id        VARCHAR(22)  NOT NULL PRIMARY KEY,
+    user_id        VARCHAR(50)  NOT NULL PRIMARY KEY,
     first_name     VARCHAR(50)  NOT NULL,
     last_name      VARCHAR(50)  NOT NULL,
     email          VARCHAR(100) NOT NULL,
-    password       VARCHAR(20)  NOT NULL,
+    password       VARCHAR(255) NOT NULL, -- Increased length for password storage
     phone_number   VARCHAR(20) DEFAULT NULL,
     is_non_locked  BOOLEAN     DEFAULT TRUE,
     is_enabled     BOOLEAN     DEFAULT FALSE,
@@ -40,28 +39,28 @@ CREATE TABLE Users
     CONSTRAINT UQ_Users_email UNIQUE (email)
 );
 
--- Create the Playlists table
-CREATE TABLE Playlists
-(
-    playlist_id VARCHAR(22) NOT NULL PRIMARY KEY, -- from Spotify
-    owner_id    VARCHAR(22) NOT NULL,
-    user_id     VARCHAR(22) NOT NULL,
-    genre_id    VARCHAR(25) NOT NULL,
-
-    FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE NO ACTION ON UPDATE CASCADE,
-    FOREIGN KEY (genre_id) REFERENCES Genres (genre_id) ON DELETE NO ACTION ON UPDATE CASCADE
-);
-
+-- Create the Genres table
 CREATE TABLE Genres
 (
     genre_id     BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    genre_name   VARCHAR(25) NOT NULL
+    genre_name   VARCHAR(50) NOT NULL -- Increased length for genre names
 );
 
+-- Create the Playlists table
+CREATE TABLE Playlists
+(
+    playlist_id VARCHAR(50) NOT NULL PRIMARY KEY, -- Increased length for playlist IDs
+    owner_id    VARCHAR(50) NOT NULL,
+    user_id     VARCHAR(50) NOT NULL,
+
+    FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE NO ACTION ON UPDATE CASCADE
+);
+
+-- Create the Genres_Playlists table
 CREATE TABLE Genres_Playlists
 (
-    genre_id       VARCHAR(22) NOT NULL,
-    playlist_id    VARCHAR(22) NOT NULL,
+    genre_id       BIGINT UNSIGNED NOT NULL,
+    playlist_id    VARCHAR(50) NOT NULL,
 
     PRIMARY KEY (genre_id, playlist_id),
 
@@ -79,11 +78,11 @@ CREATE TABLE Genres_Playlists
 -- Create the Tracks table
 CREATE TABLE Tracks
 (
-    track_id              VARCHAR(22)        NOT NULL PRIMARY KEY,
-    artist_names          VARCHAR(200)       NOT NULL,
-    track_name            VARCHAR(200)       NOT NULL,
-    album_name            VARCHAR(200)       NOT NULL,
-    external_spotify_url  VARCHAR(254)       NOT NULL,
+    track_id              VARCHAR(50)        NOT NULL PRIMARY KEY, -- Increased length for track IDs
+    artist_names          VARCHAR(255)       NOT NULL,
+    track_name            VARCHAR(255)       NOT NULL,
+    album_name            VARCHAR(255)       NOT NULL,
+    external_spotify_url  VARCHAR(255)       NOT NULL,
     length_seconds        MEDIUMINT UNSIGNED NOT NULL COMMENT 'The longest song in Spotify is about 2 days long',
     track_popularity      TINYINT UNSIGNED   NOT NULL,
     tempo                 TINYINT ZEROFILL   NOT NULL,
@@ -95,8 +94,8 @@ CREATE TABLE Tracks
 -- Create the Playlists_Tracks table
 CREATE TABLE Playlists_Tracks
 (
-    playlist_id VARCHAR(22) NOT NULL,
-    track_id    VARCHAR(22) NOT NULL,
+    playlist_id VARCHAR(50) NOT NULL,
+    track_id    VARCHAR(50) NOT NULL,
 
     PRIMARY KEY (playlist_id, track_id),
 
@@ -131,7 +130,7 @@ CREATE TABLE Events
 CREATE TABLE User_Events
 (
     user_event_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user_id       VARCHAR(22)     NOT NULL,
+    user_id       VARCHAR(50)     NOT NULL,
     event_id      BIGINT UNSIGNED NOT NULL,
     device        VARCHAR(50)  DEFAULT NULL,
     ip_address    VARCHAR(100) DEFAULT NULL,
@@ -145,7 +144,7 @@ CREATE TABLE User_Events
 CREATE TABLE Account_Verifications
 (
     account_verification_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user_id                 VARCHAR(22)     NOT NULL,
+    user_id                 VARCHAR(50)     NOT NULL,
     url                     VARCHAR(255) DEFAULT NULL,
 
     FOREIGN KEY (user_id) REFERENCES Users (user_id) ON DELETE CASCADE ON UPDATE CASCADE,
@@ -157,7 +156,7 @@ CREATE TABLE Account_Verifications
 CREATE TABLE Reset_Password_Verifications
 (
     reset_verification_id BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user_id               VARCHAR(22)     NOT NULL,
+    user_id               VARCHAR(50)     NOT NULL,
     url                   VARCHAR(255) DEFAULT NULL,
     expiry_date           DATETIME        NOT NULL,
 
@@ -170,7 +169,7 @@ CREATE TABLE Reset_Password_Verifications
 CREATE TABLE Multi_Factor_Authentications
 (
     mfa_id       BIGINT UNSIGNED NOT NULL AUTO_INCREMENT PRIMARY KEY,
-    user_id      VARCHAR(22)     NOT NULL,
+    user_id      VARCHAR(50)     NOT NULL,
     mfa_code     VARCHAR(10) DEFAULT NULL,
     expiry_date  DATETIME        NOT NULL,
 
@@ -178,3 +177,4 @@ CREATE TABLE Multi_Factor_Authentications
     CONSTRAINT UQ_mfa_user_id UNIQUE (user_id),
     CONSTRAINT UQ_mfa_code UNIQUE (mfa_code)
 );
+

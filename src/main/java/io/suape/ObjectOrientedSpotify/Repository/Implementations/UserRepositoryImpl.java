@@ -31,7 +31,7 @@ import static java.util.Objects.requireNonNull;
 public class UserRepositoryImpl implements UserRepository<User> {
     private static final String COUNT_USER_EMAIL_QUERY = ""; //This is empty at the moment
     private final NamedParameterJdbcTemplate jdbc;
-    private final BCryptPasswordEncoder encoder;
+    //private final BCryptPasswordEncoder encoder;
     @Override
     public User create(User user) {
         //check email is unique
@@ -47,7 +47,7 @@ public class UserRepositoryImpl implements UserRepository<User> {
             //user.setUserId(requireNonNull());
             //verification
             String verificationUrl = getVerificationUrl(UUID.randomUUID().toString(), ACCOUNT.getType());
-            jdbc.update(INSERT_ACCOUNT_VERIFICATION_QUERY, of("userId", user.getUserId(), "url", getVerificationUrl()))
+            //jdbc.update(INSERT_ACCOUNT_VERIFICATION_QUERY, of("userId", user.getUserId(), "url", getVerificationUrl()));
         }catch (EmptyResultDataAccessException exception){
 
         }catch (Exception exception){
@@ -88,8 +88,8 @@ public class UserRepositoryImpl implements UserRepository<User> {
         return new MapSqlParameterSource()
                 .addValue("first_name", user.getFirstName())
                 .addValue("last_name", user.getLastName())
-                .addValue("email", user.getEmail())
-                .addValue("password", encoder.encode(user.getPassword()));
+                .addValue("email", user.getEmail());
+//                .addValue("password", encoder.encode(user.getPassword()));
     }
 
     private String getVerificationUrl(String key, String type){

@@ -63,11 +63,10 @@ name, length, key, artists, etc...).
 
 TODO:
 For more details please see:
-- [Long-form project explanation]()
 - [Tech Stack and Architecture]()
-- [Database Model]()
-- [Technical Spec & Requirements]()
-- [All other research]() 
+- [Database Model](research/Database_Model.md)
+- [Technical Spec & Requirements](research/Technical_Requirements.md)
+- [All other research](research) 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
@@ -113,25 +112,29 @@ Genre (SubGenre) extends (SubGenre) implements (an unimplemented, aka abstract, 
 You can see the inspiration of Java naming conventions very clearly, because I came up with this system years ago while learning Java. Thankfully, the naming conventions have been very powerful in letting me organize subsets of playlists.
 
 Genres are abstract concepts that encompass playlist categories (the equivalent of spotify folders)
-![Genres](research/ResearchResources/GenresExamples.png)
+
+<img src="research/ResearchResources/GenresExamples.png" alt="Genres" width="50%" height="50%">
 
 SubGenres are just regular playlists, but they can also be abstract playlists living in the webapp environment. They are the ones directly affected by inheritance.
 
 When a playlist (or SubGenre) implements another it will use every song in it no matter what. Also, a playlist can implement an idea. Maybe you want to create a playlist that has a LOT of music from a certain label (or a band), but you find an unrelated song that fits that label’s sound and you also don’t want to actually create a SubGenre of just this label. So, you create a SubGenre that implements the idea of the label’s name.
 
 Here are some examples:  
-
 (Main) is a real playlist that contains the entire discography of the Arctic Monkeys, but also implements (TLSP). (TLSP) contains songs from lead vocalist Alex Turner of the Arctic Monkeys, but with another band.
-![AMExample](research/ResearchResources/implementations and extensions.jpg)
 
-(Cawabonga) is implementing (Rawsome) which is a music label with a very distinctive sound.
-![LabelExample](research/ResearchResources/LabelImplementation.jpg)
+<img src="research/ResearchResources/implementations and extensions.jpg" alt="AMExample" width="50%" height="50%">
 
-Here, both playlists below are implementing (Parcels), which is a band. (Parcels) is an abstract playlist that can contain 0 songs, or a few songs you want any song that contains parcels to have. Like your favourite song by them.
-![BandExample](research/ResearchResources/Band Implementation.jpg)
+(Cawabonga) is implementing (Rawsome), which is a music label with a very distinctive sound.
+
+<img src="research/ResearchResources/LabelImplementation.jpg" alt="LabelExample" width="50%" height="50%">
+
+Here, both playlists below are implementing (Parcels), which is a band. (Parcels) is an abstract playlist that can contain 0 songs or a few songs you want any song that contains parcels to have, like your favorite song by them.
+
+<img src="research/ResearchResources/Band Implementation.jpg" alt="BandExample" width="50%" height="50%">
 
 The playlist underneath extends Conventional because it inherits a lot of the songs but overrides (or omits) a lot of them.
-![ExtensionExample](research/ResearchResources/Implementation of Real Subgenre.jpg)
+
+<img src="research/ResearchResources/Implementation of Real Subgenre.jpg" alt="ExtensionExample" width="50%" height="50%">
 
 Extending a playlist (SubGenre) means that either:  
 - 20% or more of the songs in this playlist are also present in the extended playlist  
@@ -150,30 +153,38 @@ For more information about this visit [Technical Requirements](research/Technica
 - [x] Create outline of app requirements
 - [x] Design SQL database
 - [x] Design rough design of backend and frontend structure
-- [ ] Implement all backend
-    - [x] Implement User repository
-    - [ ] Spring Security configuration
-    - [ ] Login functionality with Spotify
-    - [ ] User authorization filters
-    - [ ] Implement reset password feature
-    - [ ] Account verification
-    - [ ] Refresh tokens
+- [ ] Implement Minimum Backend 
+  - [x] Implement User repository
+  - [ ] Spring Security configuration
+  - [ ] Login functionality with Spotify
+  - [ ] User authorization filters
+  - [ ] Implement reset password feature
+  - [ ] Account verification
+  - [ ] Refresh tokens
+- [ ] Implement Minimum Frontend
+  - [ ] Login Page
+  - [ ] Login with Spotify
+  - [ ] JWT
+  - [ ] User password update
+  - [ ] User account settings
+- [ ] Fully Implement Backend Repositories
     - [ ] Implement Playlist Repository
     - [ ] Implement Tracks Repository
     - [ ] Implement Abstract Playlists Repository
-    - [ ] Finalize business logic and services
-- [ ] Implement all frontend
-  - [ ] Todo
+- [ ] Finalize Business logic and services
+- [ ] Design all frontend
+- [ ] Sync frontend with backend services and Deploy
 
 Some features for the future are:
+- Graphs of song specific attributes across the playlist to measure energy levels and other song traits
+- Ability to optimize for smoothness or discrete jumps in energy, instrumental, acoustic, vocal, etc... in a playlist
 - AI generator for description of playlists
 - Genre analyzer (scrapping or AI with waveforms like serato and rekordbox)
 - AI playlist generations by waveform analysis. Beyond the scope most definitely because this would be extremely resource intensive, but interesting to implement.
 - A “now playing” integration, probably with web-sockets.
 - Cross-platform listening parties (the reason why we want web-sockets above).
-- Multi-user functionality for concurrent edits to the same account.
-
-In addition, another platform called Soundiiz provides a paid cross-platform playlist management solution that works with 44 streaming services. It has the following features: cross platform playlist conversion, cross platform playlist synchronization, links, AI generated playlists, sorts, imports, exports, merging, joining, replacing, splitting, shuffling, and cloning. These features are mostly beyond the scope of this project; however, playlist conversion/transfer and exporting would be great to have.
+- Multi-user functionality for concurrent edits to the same account.w
+- Multi-platform sync for services like Apple Music, YouTube music, and Deezer
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
 
