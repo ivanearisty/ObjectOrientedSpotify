@@ -8,13 +8,13 @@ spring:
     generate-ddl: true
     show-sql: true
     hibernate:
-      ddl-auto: none
+      ddl-auto: update
+      # TODO Disable automatic table creation/update before prod
     properties:
       hibernate:
         dialect: org.hibernate.dialect.MySQL8Dialect
         format_sql: true
         globally_quoted_identifiers: true
-        # Disable automatic table creation/update
   sql:
     init:
       mode: always

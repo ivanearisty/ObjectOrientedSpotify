@@ -9,13 +9,16 @@ We will be following a DDD model. Knowledge is based on these articles:
 - https://en.wikipedia.org/wiki/Domain-driven_design
 - https://softwareengineering.stackexchange.com/questions/330428/ddd-repositories-in-application-or-domain-service
 - https://softwareengineering.stackexchange.com/questions/323686/what-layer-should-contain-interactions-with-external-or-remote-resources-which-a
+- https://medium.com/@enocklubowa/why-you-need-to-use-dtos-in-your-rest-api-d9d6d7be5450#:~:text=The%20Domain%20layer%20defines%20the,by%20the%20underlying%20Domain%20object.
 
 So, in essence, I want to create a couple of layers to handle everything.
 
 At the time of writing, I am working on the backend. So, I plan to have:
 
-- Client layers down the line
-- Domain layer for encapsulating business logic
+- Presentation layers and frontend
+- Service layer for Data Transfer Objects
+- Data Transfer Object mappers and classes 
+- The Domain layer defines the actual business data involved in the application. For example for a User, we have all data stored about them defined here.
 - Repository layer for communicating with the database and
 - Exceptions layer (I don’t know if this should even be a layer)
 - Infrastructure layer (will handle communication with external APIs)

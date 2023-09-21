@@ -5,59 +5,56 @@ import io.suape.ObjectOrientedSpotify.OOSExceptions.APIException;
 import io.suape.ObjectOrientedSpotify.Repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Required;
-import org.springframework.dao.EmptyResultDataAccessException;
-import org.springframework.jdbc.core.SqlParameter;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
-import org.springframework.jdbc.support.GeneratedKeyHolder;
-import org.springframework.jdbc.support.KeyHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Collection;
-import java.util.Map;
 import java.util.UUID;
 
 import static io.suape.ObjectOrientedSpotify.Enums.VerificationType.ACCOUNT;
-import static java.util.Map.*;
-import static java.util.Objects.requireNonNull;
+import static io.suape.ObjectOrientedSpotify.Queries.UserQueries.*;
+import static java.util.Map.of;
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
 public class UserRepositoryImpl implements UserRepository<User> {
-    private static final String COUNT_USER_EMAIL_QUERY = ""; //This is empty at the moment
     private final NamedParameterJdbcTemplate jdbc;
-    //private final BCryptPasswordEncoder encoder;
+    //TODO: configure spring security encoder and bean
+    private final BCryptPasswordEncoder encoder;
     @Override
     public User create(User user) {
         //check email is unique
         if(getEmailCount(user.getEmail().trim().toLowerCase()) > 0){
             throw new APIException("Email already in use");
         }
-        //get spotify credentials
-        String spotifyUserId;
-
         //save new user
         try{
+            //TODO: get spotify credentials
+            String spotifyUserId = "test";
+            //set user id
+            user.setUserId(spotifyUserId);
+            //insert user
             SqlParameterSource parameterSource = getSQLParameterSource(user);
-            //user.setUserId(requireNonNull());
+            jdbc.update(INSERT_USER_QUERY,parameterSource);
             //verification
             String verificationUrl = getVerificationUrl(UUID.randomUUID().toString(), ACCOUNT.getType());
-            //jdbc.update(INSERT_ACCOUNT_VERIFICATION_QUERY, of("userId", user.getUserId(), "url", getVerificationUrl()));
-        }catch (EmptyResultDataAccessException exception){
-
+            //save url in verification table
+            jdbc.update(INSERT_ACCOUNT_VERIFICATION_URL_QUERY, of("userId", user.getUserId(), "url", verificationUrl));
+            //send email with verification url
+            //TODO: implement email service
+            //emailService.sendVerificationURL(user.getFirstName(), user.getEmail(), verificationUrl, ACCOUNT);
+            user.setEnabled(false);
+            user.setNonLocked(true);
+            //return new user
+            return user;
         }catch (Exception exception){
-
+            throw new APIException("Unknown error");
         }
-        //save url in verification table
-        //send email to user with verification url
-        //return user
-        //if error throw exception with proper message
-        return null;
     }
 
     @Override
@@ -86,10 +83,12 @@ public class UserRepositoryImpl implements UserRepository<User> {
 
     private SqlParameterSource getSQLParameterSource(User user) {
         return new MapSqlParameterSource()
-                .addValue("first_name", user.getFirstName())
-                .addValue("last_name", user.getLastName())
-                .addValue("email", user.getEmail());
-//                .addValue("password", encoder.encode(user.getPassword()));
+                .addValue("userId", user.getUserId())
+                .addValue("firstName", user.getFirstName())
+                .addValue("lastName", user.getLastName())
+                .addValue("email", user.getEmail())
+                // TODO: Add bean for encoder
+                .addValue("password", encoder.encode(user.getPassword()));
     }
 
     private String getVerificationUrl(String key, String type){
