@@ -10,44 +10,37 @@ We will be following a DDD model. Knowledge is based on these articles:
 - https://softwareengineering.stackexchange.com/questions/330428/ddd-repositories-in-application-or-domain-service
 - https://softwareengineering.stackexchange.com/questions/323686/what-layer-should-contain-interactions-with-external-or-remote-resources-which-a
 - https://medium.com/@enocklubowa/why-you-need-to-use-dtos-in-your-rest-api-d9d6d7be5450#:~:text=The%20Domain%20layer%20defines%20the,by%20the%20underlying%20Domain%20object.
+- https://ademcatamak.medium.com/layers-in-ddd-projects-bd492aa2b8aa
+- https://www.geeksforgeeks.org/application-layer-in-osi-model/
+- https://wiki.c2.com/?EntityBeansAsDomainObjects
+## The four layers
+1. **Presentation**  
+The Presentation Layer serves as the interface for interactions with external systems, acting as the gateway for real user inputs that affect the domain. It accepts requests and shapes responses, facilitating communication between the system and users.   
+In our project, this layer uses Controllers for HTTP interactions. All of our Angular components live here.  
+Contains our `Resource` package.
 
-So, in essence, I want to create a couple of layers to handle everything.
 
-At the time of writing, I am working on the backend. So, I plan to have:
+2. **Application**:  
+   Mediates between the various user interface components on a GUI screen and translates the messages that they understand into messages understood by the objects in the domain model.
+   The application layer must only coordinate tasks and must not hold or define any domain state (domain model). It delegates the execution of business rules to the domain model classes themselves (aggregate roots and domain entities), which will ultimately update the data within those domain entities.  
+   Contains our `Service` package.
 
-- Presentation layers and frontend
-- Service layer for Data Transfer Objects
-- Data Transfer Object mappers and classes 
-- The Domain layer defines the actual business data involved in the application. For example for a User, we have all data stored about them defined here.
-- Repository layer for communicating with the database and
-- Exceptions layer (I don’t know if this should even be a layer)
-- Infrastructure layer (will handle communication with external APIs)
 
-The following is an AI assisted summary of some of the layers:
+3. **Domain**:
+This is the core of the application. It is the layer where all business rules related to the problem to be solved are included. In this layer; entities, value objects, aggregates, factories and interfaces will take place.  
+This layer must completely ignore data persistence details. These persistence tasks should be performed by the infrastructure layer. Therefore, this layer should not take direct dependencies on the infrastructure, which means that Beans in the domain layer will usually be entities.  
+**Contains multiple packages:**
+   - Domain: represents core business entities.
+   - DTO: Contains DTO classes to transfer data between layers. 
+   - Enums: Contains enum classes, which may represent domain-specific constants. 
+   - Exceptions: Contains custom exceptions used in the project, which are part of the domain's error-handling logic.
+   - Queries: Contains SQL queries as strings (which are typically used for data access).
 
-**Domain Layer:**
-The Domain Layer is a fundamental part of the application's architecture, focusing on modeling the core business logic and rules. In the context of the application that interacts with the Database, Spotify API, Twilio, and an email API, the Domain Layer will encompass the following responsibilities:
 
-1. **Business Logic:** This layer will hold the application's core business rules and logic, ensuring that the software processes align with the real-world domain. For instance, the logic for user authentication, playlist management, and multi-factor authentication (MFA) will be defined here.
-2. **Entities:** The Domain Layer will define entities that represent the key concepts of your application, such as Users, Playlists, and AuthenticationTokens. These entities encapsulate both behavior and state.
-3. **Aggregates:** In the context of DDD, aggregates are clusters of related entities that are treated as a single unit. For instance, a User aggregate might include the User entity along with related entities like Playlists. This helps to maintain consistency and ensure proper encapsulation of business rules.
-4. **Value Objects:** Value objects represent components of your application that are identified solely by their attributes, without any conceptual identity. For example, the attributes of an email address or a phone number could be represented as value objects.
-5. **Domain Events:** Domain events represent important occurrences in the domain that need to be captured for various purposes. For instance, an event might be triggered when a new user is registered or when a playlist is created.
-
-**Repository Layer:**
-The Repository Layer is responsible for handling the interactions between the Domain Layer and external data sources, such as databases, APIs, or caches. Here's how the Repository Layer will be structured in your application:
-
-1. **Data Mapping:** The Repository Layer will mediate between the Domain Layer and the data sources, mapping data from external sources into domain models. For instance, when interacting with the Spotify API, the repository would handle the conversion of API responses into domain entities like Users and Playlists.
-2. **Caching:** If caching is employed in your application to improve performance, the Repository Layer will encapsulate the caching mechanism. The Domain Layer doesn't need to be concerned with caching details.
-3. **Concurrency:** The Repository Layer should ensure concurrency safety, especially when dealing with cached data or handling multiple concurrent requests that need access to the same data. Modern concurrency mechanisms like coroutines can be employed for this purpose.
-4. **Single Source of Truth:** The Repository Layer serves as the single source of truth for domain models across the application. It ensures that consistent data is provided to the Domain Layer, preventing potential data inconsistencies that might arise from multiple sources.
-
-**Communication Between Layers:**
-The communication between the Domain Layer and the Repository Layer will primarily revolve around the following interactions:
-
-1. **Data Retrieval:** The Domain Layer will request data from the Repository Layer using methods like `getUserByID` or `getPlaylistByID`. The Repository Layer will then fetch the data from external sources and perform necessary data mapping.
-2. **Data Modification:** When the Domain Layer needs to modify data, such as updating a playlist or creating a new user, it will invoke methods in the Repository Layer, such as `updatePlaylist` or `createUser`. The Repository Layer will handle the necessary interactions with external data sources to persist the changes.
-3. **Concurrency Control:** If concurrency is involved, the Repository Layer will ensure that data updates are handled in a thread-safe manner, preventing race conditions.
-4. **Caching:** If caching is used, the Repository Layer will manage cache interactions, ensuring that cached data remains consistent with the external data sources.
-
-In summary, your application's Domain Layer will encapsulate the core business logic and rules, while the Repository Layer will handle data interactions with external sources, including data mapping, caching, and concurrency control. The two layers will communicate to provide a seamless and consistent experience for your application's users while maintaining separation of concerns and adhering to DDD principles.
+4. **Infrastructure**:  
+The infrastructure layer is how the data that is initially held in domain entities (in memory) is persisted in databases or another persistent store. It also includes methods for the domain layer to call for data access.  
+This layer will be the layer that accesses external services such as database, messaging systems and email services.  
+   **Contains multiple packages:**
+   - Repository: Contains classes that are responsible for data access and bridge the gap between the domain and the database.
+   - Infrastructure: Contains connections to external APIs like SpotifyAPI, which aligns with accessing external services. 
+   - Queries: Contains SQL queries (strings) for data access. While queries are also found in the Domain Layer, they are closely associated with data persistence, making them part of the Infrastructure Layer.

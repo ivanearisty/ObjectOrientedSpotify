@@ -63,9 +63,9 @@ name, length, key, artists, etc...).
 
 TODO:
 For more details please see:
-- [Tech Stack and Architecture]()
-- [Database Model](research/Database_Model.md)
-- [Technical Spec & Requirements](research/Technical_Requirements.md)
+- [Tech Stack and Architecture](https://github.com/ivanearisty/ObjectOrientedSpotify/blob/4d198169c109525ecd268379d7463a4a987465fe/research/Tech%20Stack%20and%20Architecture.md)
+- [Database Model](https://github.com/ivanearisty/ObjectOrientedSpotify/blob/1db9f1cf2ab944eb7bc5d34eaa3090f9f6852591/research/Database_Model.md)
+- [Technical Spec & Requirements](https://github.com/ivanearisty/ObjectOrientedSpotify/blob/cb67e178aaf7411c24c9f0e7d33322884cd7f0b2/research/Technical_Requirements.md)
 - [All other research](research) 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
