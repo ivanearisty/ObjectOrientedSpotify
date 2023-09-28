@@ -12,13 +12,11 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
-
 import javax.validation.Valid;
-
 import java.net.URI;
-import java.util.Map;
 
 import static java.time.LocalDateTime.now;
+import static java.util.Map.of;
 
 @RestController
 @RequestMapping(path = "/user")
@@ -26,13 +24,14 @@ import static java.time.LocalDateTime.now;
 public class UserResource {
     private final UserService userService;
 
+    //@Valid makes sure that the user is completes all the required fields in Domain
     @PostMapping("/register")
     public ResponseEntity<HttpResponse> saveUser(@RequestBody @Valid User user){
         UserDTO userDTO = userService.createUser(user);
         return ResponseEntity.created(getUri()).body(
                 HttpResponse.builder()
                         .timeStamp(now().toString())
-                        .data(Map.of("user", userDTO))
+                        .data(of("user", userDTO))
                         .message("User Created")
                         .status(HttpStatus.CREATED)
                         .statusCode(HttpStatus.CREATED.value())
@@ -43,7 +42,7 @@ public class UserResource {
     private URI getUri() {
         return URI.create(ServletUriComponentsBuilder
                 .fromCurrentContextPath()
-                .path("/user/get/<userId>)")
+                .path("/user/get/<userId>)") //TODO: Create a method that returns the URI of the resource (user) when you pass get and the userID
                 .toUriString());
     }
 }

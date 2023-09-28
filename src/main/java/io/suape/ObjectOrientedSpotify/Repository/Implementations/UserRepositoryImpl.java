@@ -24,6 +24,7 @@ import static java.util.Map.of;
 @Slf4j
 public class UserRepositoryImpl implements UserRepository<User> {
     private final NamedParameterJdbcTemplate jdbc;
+
     //TODO: configure spring security encoder and bean
     private final BCryptPasswordEncoder encoder;
     @Override

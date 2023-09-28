@@ -186,17 +186,6 @@ Some features for the future are:
 - Multi-user functionality for concurrent edits to the same account.w
 - Multi-platform sync for services like Apple Music, YouTube music, and Deezer
 
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-<!-- LICENSE -->
-## License
-
-Distributed under the MIT License. See `LICENSE.txt` for more information.
-
-<p align="right">(<a href="#readme-top">back to top</a>)</p>
-
-
-
 <!-- CONTACT -->
 ## Contact
 
