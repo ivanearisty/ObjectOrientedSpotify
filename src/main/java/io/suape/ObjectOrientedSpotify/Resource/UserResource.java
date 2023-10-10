@@ -24,14 +24,25 @@ import static java.util.Map.of;
 public class UserResource {
     private final UserService userService;
 
-    //@Valid makes sure that the user is completes all the required fields in Domain
+    @PostMapping("/hello")
+    public ResponseEntity<HttpResponse> sayHi(){
+        return ResponseEntity.created(getUri()).body(
+                HttpResponse.builder()
+                        .timeStamp(now().toString())
+                        .message("Hello!")
+                        .status(HttpStatus.ACCEPTED)
+                        .statusCode(HttpStatus.ACCEPTED.value())
+                        .build()
+        );
+    }
+    //@Valid makes sure that the user completes all the required fields in Domain
     @PostMapping("/register")
     public ResponseEntity<HttpResponse> saveUser(@RequestBody @Valid User user){
         UserDTO userDTO = userService.createUser(user);
         return ResponseEntity.created(getUri()).body(
                 HttpResponse.builder()
                         .timeStamp(now().toString())
-                        .data(of("user", userDTO))
+                        .data(of("user", userDTO)) //TODO: Remove after testing
                         .message("User Created")
                         .status(HttpStatus.CREATED)
                         .statusCode(HttpStatus.CREATED.value())
@@ -39,6 +50,7 @@ public class UserResource {
         );
     }
 
+    //TODO: this is going to have to get re-written so that we can support multiple URIs
     private URI getUri() {
         return URI.create(ServletUriComponentsBuilder
                 .fromCurrentContextPath()

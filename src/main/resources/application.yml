@@ -1,24 +1,3 @@
 spring:
-  datasource:
-    url: jdbc:mysql://localhost:3306/ObjectOrientedSpotify
-    username: root
-    password: ${SQL_password}
-  jpa:
-    database-platform: org.hibernate.dialect.MySQL8InnoDBDialect
-    generate-ddl: true
-    show-sql: true
-    hibernate:
-      ddl-auto: update
-      # TODO Disable automatic table creation/update before prod
-    properties:
-      hibernate:
-        dialect: org.hibernate.dialect.MySQL8Dialect
-        format_sql: true
-        globally_quoted_identifiers: true
-  sql:
-    init:
-      mode: always
-      continue-on-error: false
-      schema-locations: classpath:schema.sql
-server:
-  port : 8080
+  profiles:
+    active: dev

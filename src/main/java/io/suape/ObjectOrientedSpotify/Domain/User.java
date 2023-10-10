@@ -5,9 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-
-import javax.persistence.Entity;
-import javax.persistence.Id;
+//TODO: change these to jakarta
 import javax.validation.constraints.Email;
 import javax.validation.constraints.NotEmpty;
 import java.io.Serializable;
@@ -20,9 +18,7 @@ import static com.fasterxml.jackson.annotation.JsonInclude.Include.NON_DEFAULT;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonInclude(NON_DEFAULT)
-@Entity
 public class User implements Serializable {
-    @Id
     private String userId;
     @NotEmpty(message = "First name can't be empty")
     private String firstName;
@@ -30,7 +26,7 @@ public class User implements Serializable {
     private String lastName;
     @NotEmpty(message = "Password can't be empty")
     private String password;
-    @NotEmpty(message = "First name can't be empty")
+    @NotEmpty(message = "email can't be empty")
     @Email(message = "Please enter a valid email")
     private String email;
     private String phoneNumber;

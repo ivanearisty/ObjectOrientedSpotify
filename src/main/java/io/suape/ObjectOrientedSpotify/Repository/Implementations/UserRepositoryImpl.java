@@ -25,7 +25,6 @@ import static java.util.Map.of;
 public class UserRepositoryImpl implements UserRepository<User> {
     private final NamedParameterJdbcTemplate jdbc;
 
-    //TODO: configure spring security encoder and bean
     private final BCryptPasswordEncoder encoder;
     @Override
     public User create(User user) {
@@ -51,9 +50,11 @@ public class UserRepositoryImpl implements UserRepository<User> {
             //emailService.sendVerificationURL(user.getFirstName(), user.getEmail(), verificationUrl, ACCOUNT);
             user.setEnabled(false);
             user.setNonLocked(true);
+            log.info("Created new user " + user.getFirstName());
             //return new user
             return user;
         }catch (Exception exception){
+            log.error(exception.getMessage());
             throw new APIException("Unknown error");
         }
     }
