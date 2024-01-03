@@ -18,8 +18,6 @@ public class UserPrincipal implements UserDetails {
     //Typically we will have a Role class to execute granted authority checks, but for now we don't need to mind that.
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
-        log.info("Executed Granted Authority");
-//
         return new HashSet<GrantedAuthority>();
     }
 

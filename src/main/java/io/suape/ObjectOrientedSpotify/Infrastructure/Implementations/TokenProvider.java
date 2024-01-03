@@ -7,7 +7,6 @@ import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.exceptions.TokenExpiredException;
 import io.suape.ObjectOrientedSpotify.Domain.UserPrincipal;
 import jakarta.servlet.http.HttpServletRequest;
-import lombok.extern.log4j.Log4j;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -22,7 +21,6 @@ import java.util.List;
 
 import static com.auth0.jwt.algorithms.Algorithm.*;
 import static java.lang.System.currentTimeMillis;
-@Log4j
 @Component
 public class TokenProvider {
     public static final long ACCESS_EXPIRATION = 1_800_000;

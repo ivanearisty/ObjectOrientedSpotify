@@ -10,11 +10,11 @@ import io.suape.ObjectOrientedSpotify.Infrastructure.Implementations.TokenProvid
 import io.suape.ObjectOrientedSpotify.Service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.apache.tomcat.util.net.openssl.ciphers.Authentication;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import jakarta.validation.Valid;
@@ -94,6 +94,23 @@ public class UserResource {
                                 "access_token", tokenProvider.createAccessToken(getUserPrincipal(userDTO)),
                                 "refresh_token", tokenProvider.createRefreshToken(getUserPrincipal(userDTO))))
                         .message("Login was Successful")
+                        .status(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .build());
+    }
+
+    @GetMapping("/profile")
+    private ResponseEntity<HttpResponse> getProfile(Authentication authentication) {
+
+        UserDTO userDTO = userService.getUserByEmail(authentication.getName());
+        System.out.println(authentication.getPrincipal());
+        return ResponseEntity.ok().body(
+                HttpResponse.builder()
+                        .timeStamp(now().toString())
+                        .data(of(
+                                "user", userDTO
+                                ))
+                        .message("Profile retrieved")
                         .status(HttpStatus.OK)
                         .statusCode(HttpStatus.OK.value())
                         .build());

@@ -1,5 +1,6 @@
 package io.suape.ObjectOrientedSpotify.Configuration;
 
+import io.suape.ObjectOrientedSpotify.Filters.CustomOncePerRequestFilter;
 import io.suape.ObjectOrientedSpotify.Handler.CustomAccessDeniedHandler;
 import io.suape.ObjectOrientedSpotify.Handler.CustomAuthenticationEntryPoint;
 import lombok.RequiredArgsConstructor;
@@ -16,6 +17,7 @@ import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 @Configuration
 @EnableWebSecurity
@@ -28,6 +30,7 @@ public class SecurityConfig {
     private final CustomAccessDeniedHandler customAccessDeniedHandler;
     private final CustomAuthenticationEntryPoint customAuthenticationEntryPoint;
     private final UserDetailsService userDetailsService;
+    private final CustomOncePerRequestFilter customOncePerRequestFilter;
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception{
         http.csrf().disable().cors().disable();
@@ -36,6 +39,8 @@ public class SecurityConfig {
         //NOTE: if user is not enabled or locked this will explode
         http.exceptionHandling().accessDeniedHandler(customAccessDeniedHandler).authenticationEntryPoint(customAuthenticationEntryPoint);
         http.authorizeHttpRequests().anyRequest().authenticated();
+        //when someone has a token and they want to go into a protected route in the application they need to be logged in and this filter will check that
+        http.addFilterBefore(customOncePerRequestFilter, UsernamePasswordAuthenticationFilter.class);
         return http.build();
     }
 
