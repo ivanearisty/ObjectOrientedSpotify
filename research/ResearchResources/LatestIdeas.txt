@@ -1,0 +1,3 @@
+Working on access token atm, probably would be a good idea to log in users to the app with access token and then use auth0 to log in to different spotify accounts.
+
+This way we can have one user manage multiple spotify accounts in the future

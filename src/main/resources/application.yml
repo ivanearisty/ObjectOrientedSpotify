@@ -1,3 +1,9 @@
 spring:
   profiles:
-    active: dev
+    active: @spring.profiles.active@
+
+application:
+  title: ObjectOrientedSpotify
+  version: 0.1
+
+# To switch between dev and prod go to the pom and switch active profile, or just say dev in active

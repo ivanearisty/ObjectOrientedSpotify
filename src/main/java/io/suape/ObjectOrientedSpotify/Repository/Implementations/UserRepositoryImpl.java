@@ -1,28 +1,39 @@
 package io.suape.ObjectOrientedSpotify.Repository.Implementations;
 
+import io.suape.ObjectOrientedSpotify.DTO.UserDTO;
 import io.suape.ObjectOrientedSpotify.Domain.User;
+import io.suape.ObjectOrientedSpotify.Domain.UserPrincipal;
 import io.suape.ObjectOrientedSpotify.OOSExceptions.APIException;
 import io.suape.ObjectOrientedSpotify.Repository.UserRepository;
+import io.suape.ObjectOrientedSpotify.RowMapper.UserRowMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.dao.EmptyResultDataAccessException;
 import org.springframework.jdbc.core.namedparam.MapSqlParameterSource;
 import org.springframework.jdbc.core.namedparam.NamedParameterJdbcTemplate;
 import org.springframework.jdbc.core.namedparam.SqlParameterSource;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Repository;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import java.util.Collection;
+import java.util.Date;
 import java.util.UUID;
 
 import static io.suape.ObjectOrientedSpotify.Enums.VerificationType.ACCOUNT;
 import static io.suape.ObjectOrientedSpotify.Queries.UserQueries.*;
 import static java.util.Map.of;
+import static org.apache.commons.lang3.RandomStringUtils.randomAlphabetic;
+import static org.apache.commons.lang3.time.DateFormatUtils.format;
+import static org.apache.commons.lang3.time.DateUtils.addDays;
 
 @Repository
 @RequiredArgsConstructor
 @Slf4j
-public class UserRepositoryImpl implements UserRepository<User> {
+public class UserRepositoryImpl implements UserRepository<User>, UserDetailsService {
     private final NamedParameterJdbcTemplate jdbc;
 
     private final BCryptPasswordEncoder encoder;
@@ -46,9 +57,12 @@ public class UserRepositoryImpl implements UserRepository<User> {
             //save url in verification table
             jdbc.update(INSERT_ACCOUNT_VERIFICATION_URL_QUERY, of("userId", user.getUserId(), "url", verificationUrl));
             //send email with verification url
-            //TODO: implement email service
+            //TODO: implement email service. 
+            // NOTE: Implementation of how emails actually get sent should be in emailRepository or emailInfrastructure;
+            // However, bubbling up to emailService and then having emailService communicate with the implementation is NECESSARY.
+            // USER REPOSITORY SHOULD ONLY KNOW HOW TO DO THINGS FOR A USER, AND LEARNING HOW TO SEND EMAILS IS NOT ONE OF THEM
             //emailService.sendVerificationURL(user.getFirstName(), user.getEmail(), verificationUrl, ACCOUNT);
-            user.setEnabled(false);
+            user.setEnabled(true); //this should be false on prod
             user.setNonLocked(true);
             log.info("Created new user " + user.getFirstName());
             //return new user
@@ -98,5 +112,52 @@ public class UserRepositoryImpl implements UserRepository<User> {
                 .fromCurrentContextPath()
                 .path("/user/verify/" + type + "/" + key)
                 .toUriString();
+    }
+
+    @Override
+    public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
+        User user = getUserByEmail(email);
+        if(user == null){
+            log.error("Repository loadUserByUsername did not find user email: " + email);
+            throw new UsernameNotFoundException("User not found");
+        }else{
+            log.info("Repository loadUserByUsername found user email: " + email);
+            return new UserPrincipal(user);
+        }
+    }
+
+    @Override
+    public User getUserByEmail(String email) {
+        try{
+            User user = jdbc.queryForObject(SELECT_USER_BY_EMAIL_QUERY, of("email", email), new UserRowMapper());
+            log.info("Repository getUserByEmail found user email: " + email);
+            return user;
+        }catch (EmptyResultDataAccessException exception){
+            throw new APIException("No users found");
+        }catch (Exception exception){
+            log.error(exception.getMessage());
+            throw new APIException("Unknown error");
+        }
+    }
+
+
+    /**
+     * This method sends a verification code to a user.
+     * First, it deletes any code that the user might have already received from the database.
+     * Then, it generates a new code and sends it to the user utilizing a sendSMS service
+     * @param userDTO dto representing the user that will be receiving the message
+    */
+    @Override
+    public void sendVerificationCode(UserDTO userDTO) {
+        String expirationDate =  format(addDays(new Date(),1), "yyyy-MM-dd hh:mm:ss");
+        String verificationCode = randomAlphabetic(8).toUpperCase();
+        try{
+            jdbc.update(DELETE_VERIFICATION_CODE_BY_USER_ID, of("userId", userDTO.getUserId()));
+            jdbc.update(INSERT_VERIFICATION_CODE_QUERY, of("userId", userDTO.getUserId(), "code", verificationCode, "expirationDate", expirationDate));
+//            sendSMS(userDTO.getPhoneNumber(), "From: Object Oriented Spotify \nYour Verification Code is:\n" + verificationCode);
+        }catch (Exception exception){
+            log.error(exception.getMessage());
+            throw new APIException("Verification Code for MFA Failed");
+        }
     }
 }

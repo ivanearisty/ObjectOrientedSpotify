@@ -11,9 +11,19 @@ import org.springframework.stereotype.Service;
 @Service
 @RequiredArgsConstructor
 public class UserServiceImpl implements UserService {
-    private final UserRepository<User> userUserRepository;
+    private final UserRepository<User> userRepository;
     @Override
     public UserDTO createUser(User user) {
-        return DTOMapper.fromUser(userUserRepository.create(user));
+        return DTOMapper.fromUser(userRepository.create(user));
     }
+    @Override
+    public UserDTO getUserByEmail(String email) {
+        return DTOMapper.fromUser(userRepository.getUserByEmail(email));
+    }
+
+    @Override
+    public void sendVerificationCode(UserDTO userDTO) {
+        userRepository.sendVerificationCode(userDTO);
+    }
+
 }
