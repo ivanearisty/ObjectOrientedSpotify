@@ -6,6 +6,7 @@ import io.suape.ObjectOrientedSpotify.Domain.UserPrincipal;
 import io.suape.ObjectOrientedSpotify.OOSExceptions.APIException;
 import io.suape.ObjectOrientedSpotify.Repository.UserRepository;
 import io.suape.ObjectOrientedSpotify.RowMapper.UserRowMapper;
+
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.dao.EmptyResultDataAccessException;
@@ -158,6 +159,21 @@ public class UserRepositoryImpl implements UserRepository<User>, UserDetailsServ
         }catch (Exception exception){
             log.error(exception.getMessage());
             throw new APIException("Verification Code for MFA Failed");
+        }
+    }
+
+    @Override
+    public User verifyCode(String email, String code) {
+        try {
+            User userByCode = jdbc.queryForObject(SELECT_USER_BY_USER_CODE_QUERY, of("code", code), new UserRowMapper());
+            User userByEmail = jdbc.queryForObject(SELECT_USER_BY_EMAIL_QUERY, of("email", email), new UserRowMapper());
+
+            if(userByCode.getEmail().equalsIgnoreCase(userByEmail.getEmail())) return userByCode;
+            else throw new APIException("Invalid Code");
+        }catch (EmptyResultDataAccessException exception){
+            throw new APIException("Unable to find records");
+        }catch (Exception e){
+            throw new APIException("An error occurred when trying to verify user");
         }
     }
 }

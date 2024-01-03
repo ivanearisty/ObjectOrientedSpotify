@@ -38,7 +38,7 @@ public class TokenProvider {
                 .withIssuer(ISSUER)
                 .withAudience("")
                 .withIssuedAt(new Date())
-                .withSubject(userPrincipal.getUsername())
+                .withSubject(userPrincipal.getUsername()) //TODO: Change into something unrecognizable for security purposes in prod
                 .withArrayClaim("authorities", claims)
                 .withExpiresAt(new Date(currentTimeMillis() + ACCESS_EXPIRATION))
                 .sign(HMAC512(secret.getBytes()));

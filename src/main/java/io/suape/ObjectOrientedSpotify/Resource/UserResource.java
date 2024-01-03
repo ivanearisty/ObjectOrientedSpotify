@@ -15,10 +15,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 import jakarta.validation.Valid;
 import java.net.URI;
@@ -57,22 +54,6 @@ public class UserResource {
                         .build());
     }
 
-    private UserPrincipal getUserPrincipal(UserDTO userDTO) {
-        return new UserPrincipal(toUser(userDTO));
-    }
-
-    private ResponseEntity<HttpResponse> sendVerificationCode(UserDTO userDTO) {
-        userService.sendVerificationCode(userDTO);
-        return ResponseEntity.ok().body(
-                HttpResponse.builder()
-                        .timeStamp(now().toString())
-                        .data(of("user",userDTO))
-                        .message("Verification code sent")
-                        .status(HttpStatus.OK)
-                        .statusCode(HttpStatus.OK.value())
-                        .build());
-    }
-
     @PostMapping("/hello")
     public ResponseEntity<HttpResponse> sayHi(){
         return ResponseEntity.created(getUri()).body(
@@ -98,6 +79,42 @@ public class UserResource {
                         .build()
         );
     }
+
+    //This is for MFA when implemented
+    @GetMapping("/verify/code/{email}/{code}")
+    private ResponseEntity<HttpResponse> verifyCode(@PathVariable("email") String email, @PathVariable("code") String code) {
+
+        UserDTO userDTO = userService.verifyCode(email, code);
+
+        return ResponseEntity.ok().body(
+                HttpResponse.builder()
+                        .timeStamp(now().toString())
+                        .data(of(
+                                "user", userDTO,
+                                "access_token", tokenProvider.createAccessToken(getUserPrincipal(userDTO)),
+                                "refresh_token", tokenProvider.createRefreshToken(getUserPrincipal(userDTO))))
+                        .message("Login was Successful")
+                        .status(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .build());
+    }
+
+    private UserPrincipal getUserPrincipal(UserDTO userDTO) {
+        return new UserPrincipal(toUser(userDTO));
+    }
+
+    private ResponseEntity<HttpResponse> sendVerificationCode(UserDTO userDTO) {
+        userService.sendVerificationCode(userDTO);
+        return ResponseEntity.ok().body(
+                HttpResponse.builder()
+                        .timeStamp(now().toString())
+                        .data(of("user",userDTO))
+                        .message("Verification code sent")
+                        .status(HttpStatus.OK)
+                        .statusCode(HttpStatus.OK.value())
+                        .build());
+    }
+
 
     //TODO: this is going to have to get re-written so that we can support multiple URIs
     private URI getUri() {
